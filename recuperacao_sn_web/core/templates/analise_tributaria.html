@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Análise Tributária{% endblock %}
+{% block content %}
+<h2 class="mb-4">📈 Análise Tributária</h2>
+
+<form method="get" class="row g-2 mb-4">
+  <div class="col-md-5">
+    {% comment %} <input type="text" name="cnpj" class="form-control" placeholder="🔍 Buscar por CNPJ" value="{{ request.GET.cnpj }}"> {% endcomment %}
+  </div>
+  <div class="col-md-5">
+    <input type="text" name="ncm" class="form-control" placeholder="🔍 Buscar por NCM" value="{{ request.GET.ncm }}">
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+  </div>
+</form>
+
+<p class="text-muted"><strong>{{ ncms|length }}</strong> NCM(s) encontrados</p>
+
+<div class="d-flex justify-content-end mb-3 gap-2">
+    <!-- Botão para analisar apenas os NÃO ANALISADOS -->
+  <form method="post" action="{% url 'analisar_ncms_nao_analisados' %}">
+    {% csrf_token %}
+    <button class="btn btn-success btn-sm">
+      📊 Analisar NCMs <strong>NÃO ANALISADOS</strong>
+    </button>
+  </form>
+
+  <!-- Botão para analisar TODOS os NCMs -->
+  <form method="post" action="{% url 'analisar_todos_ncms' %}">
+    {% csrf_token %}
+    <button class="btn btn-warning btn-sm">
+      🔄 Analisar <strong>TODOS</strong> os NCMs
+    </button>
+  </form>
+</div>
+
+
+<div class="table-responsive shadow-sm rounded border" style="max-height: 600px; overflow-y: auto;">
+  <table id="tabelaNCM" class="table table-bordered table-hover bg-white small">
+    <thead class="table-dark">
+      <tr>
+        <th>NCM</th>
+        <th>Nome do Item</th>
+        <th>TIPI</th>
+        <th>ST</th>
+        <th>Aliq. ICMS</th>
+        <th>Desc. ICMS</th>
+        <th>Base Legal ICMS</th>
+        <th>Analisar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in ncms %}
+        <tr onclick="window.location.href='{% url 'analise_detalhada_ncm' item.id %}'" style="cursor:pointer;">
+          <td>{{ item.ncm|default:"NÃO ANALISADO" }}</td>
+          <td>{{ item.nome_item|default:"NÃO ANALISADO" }}</td>
+          <td>{{ item.desc_tipi|default:"NÃO ANALISADO" }}</td>
+          <td>{{ item.descricao_st|default:"NÃO ANALISADO" }}</td>
+          <td>{{ item.aliquota_icms_retornado|default:"NÃO ANALISADO" }}</td>
+          <td>{{ item.descricao_icms_retornado|default:"NÃO ANALISADO" }}</td>
+          <td>{{ item.base_legal_icms_retornado|default:"NÃO ANALISADO" }}</td>
+          <td>
+            <form method="post" action="{% url 'analisar_ncm' item.id %}">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-primary mt-1">🔍 Analisar</button>
+            </form>
+          </td>
+
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="7" class="text-center text-muted">Nenhum NCM encontrado.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $(document).ready(function () {
+    // Clona o cabeçalho para filtros
+    $('#tabelaNCM thead').clone(true).appendTo('#tabelaNCM');
+    $('#tabelaNCM thead:eq(1) th').each(function (i) {
+      var title = $(this).text();
+      if (title) {
+        $(this).html('<input type="text" class="form-control form-control-sm" placeholder="Filtrar ' + title + '" />');
+        $('input', this).on('keyup change', function () {
+          if ($('#tabelaNCM').DataTable().column(i).search() !== this.value) {
+            $('#tabelaNCM').DataTable().column(i).search(this.value).draw();
+          }
+        });
+      } else {
+        $(this).html('');
+      }
+    });
+
+    $('#tabelaNCM').DataTable({
+      orderCellsTop: true,
+      fixedHeader: true,
+      language: {
+        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
+      }
+    });
+  });
+</script>
+{% endblock %}

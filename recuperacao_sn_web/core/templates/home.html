@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+{% load format_extras %}
+{% load static %}
+<h2 class="text-black mb-4">📊 Painel de Controle</h2>
+
+<div class="row g-3 mb-4">
+  {% comment %} <div class="col-md-3">
+    <div class="card text-bg-light shadow-sm border-start border-primary border-4">
+      <div class="card-body">
+        <h6 class="card-title text-muted">Empresas Cadastradas</h6>
+        <h4 class="fw-bold">{{ total_empresas }}</h4>
+      </div>
+    </div>
+  </div> {% endcomment %}
+  <div class="col-md-4">
+    <div class="card text-bg-light border-start border-dark border-2" style="box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);">
+      <div class="card-body">
+        <h6 class="card-title text-muted">Notas Processadas</h6>
+        <h4 class="fw-bold">{{ total_notas|formata_qtd }}</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-light border-start border-dark border-2" style="box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);">
+      <div class="card-body">
+        <h6 class="card-title text-muted">Valor Apurado</h6>
+        <h4 class="fw-bold">{{ valor_total_apurado|formata_brl }}</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-light border-start border-dark border-2" style="box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);">
+      <div class="card-body">
+        <h6 class="card-title text-muted">ICMS Recuperado</h6>
+        <h4 class="fw-bold 
+            {% if valor_icms_total > 0 %}text-success
+            {% elif valor_icms_total < 0 %}text-danger
+            {% else %}text-muted
+            {% endif %}">
+          {{ valor_icms_total|formata_brl }}
+        </h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card text-bg-light border-start border-dark border-2" style="box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);">
+      <div class="card-body">
+        <h6 class="card-title text-muted">💰 Total Recuperado</h6>
+        <h4 class="fw-bold 
+            {% if total_recuperado > 0 %}text-success
+            {% elif total_recuperado < 0 %}text-danger
+            {% else %}text-muted
+            {% endif %}">
+          {{ total_recuperado|formata_brl }}
+        </h4>        {% comment %} <p class="text-muted small mb-0">
+          ICMS: {{ percent_icms }}% |
+          PIS: {{ percent_pis }}% |
+          COFINS: {{ percent_cofins }}%
+        </p> {% endcomment %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-light border-start border-dark border-2" style="box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);">
+      <div class="card-body">
+        <h6 class="card-title text-muted">PIS Recuperado</h6>
+        <h4 class="fw-bold 
+            {% if valor_pis_total > 0 %}text-success
+            {% elif valor_pis_total < 0 %}text-danger
+            {% else %}text-muted
+            {% endif %}">
+          {{ valor_pis_total|formata_brl }}
+        </h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-light border-start border-dark border-2" style="box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);">
+      <div class="card-body">
+        <h6 class="card-title text-muted">COFINS Recuperado</h6>
+        <h4 class="fw-bold 
+          {% if valor_cofins_total > 0 %}text-success
+            {% elif valor_cofins_total < 0 %}text-danger
+            {% else %}text-muted
+            {% endif %}">
+          {{ valor_cofins_total|formata_brl }}
+        </h4>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+  <div class="card-body">
+    <h5 class="card-title">Importar Arquivos</h5>
+    <p class="card-text">Envie arquivos XML, ZIP e PDFs para processamento e recuperação.</p>
+    <a href="{% url 'upload_view' %}" class="btn btn-warning">📥 Ir para Importação</a>
+  </div>
+</div>
+
+<h5 class="mt-5 mb-3 text-black fw-bold">💼 Apurações Fiscais da Empresa</h5>
+
+<div class="table-responsive">
+  <table class="table table-striped table-hover align-middle">
+    <thead class="table-dark text-center">
+      <tr>
+        <th>Competência</th>
+        <th>Valor NF-e</th>
+        <th>ICMS Novo</th>
+        <th>PIS Novo</th>
+        <th>COFINS Novo</th>
+        <th>Crédito Gerado</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for apuracao in apuracoes %}
+      <tr class="text-center">
+        <td>{{ apuracao.competencia }}</td>
+        <td>{{ apuracao.valor_total_nfe|formata_brl }}</td>
+        <td>{{ apuracao.valor_icms_novo|formata_brl }}</td>
+        <td>{{ apuracao.valor_pis_novo|formata_brl }}</td>
+        <td>{{ apuracao.valor_cofins_novo|formata_brl }}</td>
+        <td class="fw-semibold 
+            {% if apuracao.credito_total_apurado > 0 %}text-success
+            {% elif apuracao.credito_total_apurado < 0 %}text-danger
+            {% else %}text-muted
+            {% endif %}">
+          {{ apuracao.credito_total_apurado|formata_brl }}
+        </td>
+        <td class="text-center">
+          <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+            <a href="{% url 'apuracao_detalhada' apuracao.id %}" class="btn btn-sm btn-outline-primary">
+              📄 Apuração
+            </a>
+            {% if apuracao.pgdas and apuracao.pgdas.arquivo_pdf %}
+              <a href="{{ apuracao.pgdas.arquivo_pdf.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                🧾 PGDAS Original
+              </a>
+            {% else %}
+              <span class="text-muted small">PGDAS não importado</span>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="text-center text-muted">Nenhuma apuração encontrada.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

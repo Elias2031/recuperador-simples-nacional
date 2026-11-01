@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}📁 Importar Arquivos{% endblock %}
+
+{% block content %}
+{% load custom_filters %}
+<div class="container py-4">
+  <h2 class="mb-3 text-black">📂 Importar Arquivos</h2>
+  <p class="text-muted">Envie arquivos <strong>XML</strong>, <strong>ZIP</strong> ou <strong>PDF</strong> para processar notas e PGDAS.</p>
+
+  <form method="POST" enctype="multipart/form-data" class="row g-3 align-items-end mt-2">
+    {% csrf_token %}
+    <div class="col-md-9">
+      <input type="file" name="arquivos"  class="form-control form-control-lg shadow-sm" required webkitdirectory multiple>
+    </div>
+    <div class="col-md-3 text-end">
+      <button type="submit" class="btn btn-success w-100">
+        🚀 Enviar Arquivos
+      </button>
+    </div>
+  </form>
+
+  {% if resultado %}
+    <div class="mt-4">
+      <h5 class="mb-2">📋 Resultado da Importação:</h5>
+      <ul class="list-group">
+        {% for msg in resultado %}
+          <li class="list-group-item small">{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if uploads %}
+  <div class="mt-5">
+    <h5 class="mb-3">🗂️ Importações Recentes</h5>
+
+    {% for upload in uploads %}
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+          <div>
+            <strong>Lote:</strong> {{ upload.id }} |
+            <strong>Data:</strong> {{ upload.data_envio|date:"d/m/Y H:i" }} |
+            <strong>Status:</strong>
+            {% if upload.status == 'CONCLUIDO' %}
+              <span class="badge bg-success">Concluído</span>
+            {% elif upload.status == 'ERRO' %}
+              <span class="badge bg-danger">Erro</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">Aguardando</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="mb-1 text-muted small">{{ upload.observacao|default:"—" }}</p>
+
+          {% with arquivos=arquivos_por_lote|get_item:upload.id %}
+            {% comment %} {% if arquivos %}
+              <div class="table-responsive mt-3">
+                <table class="table table-sm table-bordered align-middle mb-0">
+                  <thead class="table-secondary">
+                    <tr>
+                      <th>Arquivo</th>
+                      <th>Tipo</th>
+                      <th>Status</th>
+                      <th>Mensagem</th>
+                      <th>Data</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for arq in arquivos %}
+                      <tr>
+                        <td>{{ arq.nome_arquivo }}</td>
+                        <td>{{ arq.tipo }}</td>
+                        <td>
+                          {% if arq.status == 'OK' %}
+                            <span class="badge bg-success">OK</span>
+                          {% elif arq.status == 'ERRO' %}
+                            <span class="badge bg-danger">Erro</span>
+                          {% else %}
+                            <span class="badge bg-secondary">Ignorado</span>
+                          {% endif %}
+                        </td>
+                        <td class="small">{{ arq.mensagem|default:"—" }}</td>
+                        <td class="text-nowrap">{{ arq.criado_em|date:"d/m/Y H:i" }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <p class="text-muted">Nenhum arquivo registrado neste lote.</p>
+            {% endif %} {% endcomment %}
+          {% endwith %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock content %}

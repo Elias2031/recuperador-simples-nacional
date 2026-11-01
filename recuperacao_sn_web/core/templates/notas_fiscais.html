@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Notas Fiscais{% endblock %}
+
+{% block content %}
+{% load nota_extras %}
+
+<h2 class="mb-4">Notas Fiscais</h2>
+<form method="get" class="row g-2 mb-4">
+  <div class="col-md-4">
+    <input type="text" name="q" class="form-control" placeholder="🔍 Buscar por chave" value="{{ request.GET.q }}">
+  </div>
+  <div class="col-md-3">
+    <select name="tipo" class="form-select">
+      <option value="">📄 Todos os tipos</option>
+      <option value="nfe" {% if request.GET.tipo == 'nfe' %}selected{% endif %}>NF-e</option>
+      <option value="cte" {% if request.GET.tipo == 'cte' %}selected{% endif %}>CT-e</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <input type="text" name="competencia" class="form-control" placeholder="🗓 Competência (ex: 03_2025)" value="{{ request.GET.competencia }}">
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+  </div>
+</form>
+
+<p class="text-muted"><strong>{{ notas|length }}</strong> Nota(s) encontradas</p>
+
+
+<div class="table-responsive shadow-sm rounded border" style="max-height: 600px; overflow-y: auto;">
+  <table id="tabelaNotas" class="table table-hover table-bordered bg-white small">
+    <thead class="table-dark">
+      <tr>
+        <th>Chave</th>
+        <th>Número / Série</th>
+        <th>Tipo</th>
+        <th>Emissão</th>
+        <th>Recebimento</th>
+        <th>Emitente / Destinatário</th>
+        <th>Valor</th>
+        <th>Arquivo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for nota in notas %}
+        <tr>
+          <td>{{ nota.chave }}</td>
+          <td>{{ nota.numero }} / {{ nota.serie }}</td>
+          <td>{{ nota.tipo|upper }}</td>
+          <td>{{ nota.data_emissao }}</td>
+          <td>
+            {% with dest=nota.participantes.all|get_participante:"destinatario" %}
+              {{ dest.data_recebimento|default:"-" }}
+            {% endwith %}
+          </td>
+          <td>
+            {% with emit=nota.participantes.all|get_participante:"emitente" dest=nota.participantes.all|get_participante:"destinatario" %}
+              <strong>Emitente:</strong> {{ emit.nome }}<br>
+              <strong>Destinatário:</strong> {{ dest.nome }}
+            {% endwith %}
+          </td>
+          <td>R$ {{ nota.valor_total }}</td>
+          <td>
+            {% if nota.arquivo_xml %}
+              <a href="{{ nota.arquivo_xml.url }}" target="_blank" class="btn btn-sm btn-outline-primary">📄 Ver XML</a>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="8" class="text-center text-muted">Nenhuma nota fiscal encontrada.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<script>
+  $(document).ready(function () {
+    // Clona o thead para colocar filtros
+    $('#tabelaNotas thead').clone(true).appendTo('#tabelaNotas');
+    $('#tabelaNotas thead:eq(1) th').each(function (i) {
+      var title = $(this).text();
+      if (title && title !== 'Arquivo') {
+        $(this).html('<input type="text" class="form-control form-control-sm" placeholder="Filtrar ' + title + '" />');
+        $('input', this).on('keyup change', function () {
+          if ($('#tabelaNotas').DataTable().column(i).search() !== this.value) {
+            $('#tabelaNotas').DataTable().column(i).search(this.value).draw();
+          }
+        });
+      } else {
+        $(this).html('');
+      }
+    });
+
+    $('#tabelaNotas').DataTable({
+      orderCellsTop: true,
+      fixedHeader: true,
+      language: {
+        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Itens de Notas Fiscais{% endblock %}
+{% load format_extras %}
+
+{% block content %}
+<h2 class="mb-4">📦 Itens de Notas Fiscais</h2>
+
+<div class="table-responsive shadow-sm rounded border" style="max-height: 600px; overflow-y: auto;">
+  <table id="tabelaItens" class="table table-bordered table-hover bg-white small">
+    <thead class="table-dark text-center">
+      <tr>
+        <th>Descrição</th>
+        <th>NCM</th>
+        <th>CST Orig.</th>
+        <th>CST Calc.</th>
+        <th>Unid.</th>
+        <th>Valor</th>
+        <th>Empresa</th>
+        <th>Nota</th>
+        <th>Competência</th>
+        <th>Tipo</th>
+      </tr>
+    </thead>
+    <thead>
+      <tr>
+        {% for i in "1234567890" %}
+          <th><input type="text" class="form-control form-control-sm" placeholder="Filtrar" /></th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in itens %}
+        <tr {% if item.ncm_analisado %} onclick="window.location.href='{% url 'analise_detalhada_ncm' item.ncm_analisado.id %}'" style="cursor: pointer;" {% endif %}>
+          <td>{{ item.descricao }}</td>
+          <td>{{ item.ncm }}</td>
+          <td class="text-center">{{ item.cst_original }}</td>
+          <td class="text-center">{{ item.ncm_analisado.cst_icms|default:"-" }}</td>
+          <td class="text-center">{{ item.unidade }}</td>
+          <td class="text-end">{{ item.valor_produto|formata_brl }}</td>
+          <td>{{ item.nota.empresa.nome }}</td>
+          <td>{{ item.nota.numero }} / {{ item.nota.serie }}</td>
+          <td>{{ item.nota.apuracao.competencia }}</td>
+          <td class="text-uppercase text-center">{{ item.nota.tipo }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  $(document).ready(function () {
+    var table = $('#tabelaItens').DataTable({
+      orderCellsTop: true,
+      fixedHeader: true,
+      language: {
+        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
+      }
+    });
+
+    $('#tabelaItens thead:eq(1) input').on('keyup change', function () {
+      let colIdx = $(this).parent().index();
+      table.column(colIdx).search(this.value).draw();
+    });
+  });
+</script>
+{% endblock %}

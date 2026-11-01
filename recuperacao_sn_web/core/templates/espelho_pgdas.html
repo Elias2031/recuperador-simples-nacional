@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+{% load format_extras %}
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 11px;
+        }
+
+        h1, h2, h3, h4, h5 {
+            margin: 0;
+            margin-top: 5px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .section {
+            font-weight: bold;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .left {
+            text-align: left;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .tabela-padrao {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tabela-padrao th,
+        .tabela-padrao td {
+            border: 1px solid #000;
+            padding: 1px;
+            height: auto;
+            vertical-align: bottom;
+            font-size: 13px;
+        }
+
+        .quebra {
+            page-break-after: always;
+        }
+
+        .assinatura {
+            margin-top: 30px;
+            font-size: 10px;
+            text-align: right;
+        }
+
+        .detalhe {
+            margin: 0;
+        }
+
+        .ajuste-largura {
+            width: 350px;
+            text-align: center;
+        }
+
+        p, pre {
+            font-size: 13px;
+        }
+
+        .mt-25 {
+            margin-top: 25px;
+        }
+
+        .mt-50 {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="logo-container">
+        <img src="{% static 'img/logo-morpho-automacao-contabil.png' %}" alt="Logo Morpho" width="80" class="mb-2">
+    </div>
+
+    <h2 class="center">
+        <strong>Programa Gerador do Documento de Arrecadação<br>do Simples Nacional - Declaratório</strong>
+    </h2>
+
+    <p><strong>Declaração Retificadora</strong></p>
+    <p class="detalhe center">Período de Apuração: <strong>{{ periodo_fim }}</strong></p>
+
+    <hr>
+
+    <div class="section">1. Identificação do Contribuinte</div>
+    <pre class="detalhe">CNPJ Matriz:                          <strong>{{ empresa.cnpj|formata_cnpj }}</strong></pre>
+    <pre class="detalhe">Nome empresarial:                     <strong>{{ empresa.razao_social }}</strong></pre>
+    <pre class="detalhe">Data de abertura no CNPJ:             <strong>{{ empresa.data_abertura }}</strong></pre>
+    <pre class="detalhe">Optante pelo Simples Nacional:        <strong>Sim</strong></pre>
+    <pre class="detalhe">Regime de Apuração:                   <strong>Competência</strong></pre>
+    <hr>
+
+    <h2><strong>2. Apuração do Simples Nacional</strong></h2>
+
+    <h4><strong>2.1 Discriminativo de Receitas</strong></h4>
+    <table class="tabela-padrao">
+        <tr>
+            <th><strong>Total de Receitas Brutas (R$)</strong></th>
+            <th><strong>Mercado Interno</strong></th>
+            <th><strong>Mercado Externo</strong></th>
+            <th><strong>Total</strong></th>
+        </tr>
+        <tr>
+            <td class="ajuste-largura">Receita Bruta do PA (RPA)</td>
+            <td>{{ apuracao.valor_total_nfe|formata_brl }}</td>
+            <td>0,00</td>
+            <td>{{ apuracao.valor_total_nfe|formata_brl }}</td>
+        </tr>
+        <tr>
+            <td>Receita bruta acumulada nos doze meses anteriores ao PA (RBT12)</td>
+            <td>{{ apuracao.pgdas.valor_rbt12|formata_brl }}</td>
+            <td>0,00</td>
+            <td>{{ apuracao.pgdas.valor_rbt12|formata_brl }}</td>
+        </tr>
+        <tr>
+            <td>Receita bruta acumulada no ano-calendário corrente (RBA)</td>
+            <td>EXTRAIR PGDAS</td>
+            <td>EXTRAIR PGDAS</td>
+            <td>EXTRAIR PGDAS</td>
+        </tr>
+        <tr>
+            <td>Receita bruta acumulada no ano-calendário anterior (RBAA)</td>
+            <td>EXTRAIR PGDAS</td>
+            <td>EXTRAIR PGDAS</td>
+            <td>EXTRAIR PGDAS</td>
+        </tr>
+        <tr>
+            <td>Limite de receita bruta proporcionalizado</td>
+            <td colspan="2">4.800.000,00</td>
+            <td>4.800.000,00</td>
+        </tr>
+    </table>
+
+    <hr>
+    <h4><strong>2.2 Receitas Brutas Anteriores (R$)</strong></h4>
+    <p><strong>Não tem importância</strong></p>
+
+    {% comment %} <table class="tabela-padrao mt-50">
+        <tr>
+            <th class="left">
+
+            </th>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                <tr>
+                    <th>IRPJ</th>
+                    <th>CSLL</th>
+                    <th>COFINS</th>
+                    <th>PIS/PASEP</th>
+                    <th>INSS/CPP</th>
+                    <th>ICMS</th>
+                    <th>IPI</th>
+                    <th>ISS</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td class="center">{{ apuracao.bloco_com_st.irpj|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_com_st.csll|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_com_st.cofins|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_com_st.pis|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_com_st.cpp|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_com_st.icms|formata_brl }}</td>
+                    <td class="center">0,00</td>
+                    <td class="center">0,00</td>
+                    <td class="center">{{ apuracao.bloco_com_st.total|formata_brl }}</td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+    </table> {% endcomment %}
+
+    <hr>
+
+    <h4><strong>2.3 Folha de Salários Anteriores (R$)</strong></h4>
+    <p><strong>Nenhuma</strong></p>
+    <hr>
+
+    <h4><strong>2.4 Fator R</strong></h4>
+    <p><strong>Não se aplica</strong></p>
+    <hr>
+
+    <div style="page-break-before: always;"></div>
+
+    {% comment %} QUEBRA DE PAGINA {% endcomment %}
+
+    <h4>2.6 Resumo da Declaração</h4>
+    <table class="tabela-padrao">
+        <tr>
+            <th class="center">Receita Bruta Auferida(regime competência)</th>
+            <th class="center">Valor Total do Débito Declarado (R$)</th>
+        </tr>
+        <tr>
+            <td class="center">{{ apuracao.valor_total_nfe|formata_brl }}</td>
+            <td class="center">{{ apuracao.valor_das_teorico|formata_brl }}</td>
+        </tr>
+    </table>
+
+    <h4 class="mt-25">2.7 Informações da declaração por estabelecimento</h4>
+    <table class="tabela-padrao">
+        <tr>
+            <th class="center">CNPJ Estabelecimento: {{ empresa.cnpj|formata_cnpj }}</th>
+            <th class="center"><pre> </pre></th>
+        </tr>
+        <tr>
+            <td class="center">Municipio : {{ empresa.municipio }}</td>
+            <td class="center">UF: {{ empresa.uf }}</td>
+        </tr>
+        <tr>
+            <td class="center">Sublimite de Receita Anual: {{apuracao.limite_superior_faixa|formata_brl}}</td>
+            <td class="center">
+                Impedido de recolher ICMS/ISS no DAS: {{ apuracao.ultrapassa_limite|yesno:"SIM,NÃO" }}
+            </td>
+        </tr>
+    </table>
+
+    <table class="tabela-padrao mt-25">
+        <tr>
+            <th class="left">
+                <span class="center">
+                    Valor do Débito por Tributo para a Atividade (R$):
+                </span><br><br>
+
+                Revenda de mercadorias, exceto para o exterior - Sem substituição tributária/tributação
+                monofásica/antecipação com encerramento de tributação (o substituto tributário do ICMS
+                deve utilizar essa opção)<br><br>
+
+                Receita Bruta Informada: {{ apuracao.bloco_sem_st.base|formata_brl }}
+            </th>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                <tr>
+                    <th>IRPJ</th>
+                    <th>CSLL</th>
+                    <th>COFINS</th>
+                    <th>PIS/PASEP</th>
+                    <th>INSS/CPP</th>
+                    <th>ICMS</th>
+                    <th>IPI</th>
+                    <th>ISS</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td class="center">{{ apuracao.bloco_sem_st.irpj|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_sem_st.csll|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_sem_st.cofins|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_sem_st.pis|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_sem_st.cpp|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_sem_st.icms|formata_brl }}</td>
+                    <td class="center">0,00</td>
+                    <td class="center">0,00</td>
+                    <td class="center">{{ apuracao.bloco_sem_st.total|formata_brl }}</td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+    </table>
+
+    <table class="tabela-padrao mt-50">
+        <tr>
+            <th class="left">
+                <span class="center">
+                    Valor do Débito por Tributo para a Atividade (R$):
+                </span><br><br>
+
+                Revenda de mercadorias, exceto para o exterior - Com substituição tributária/tributação
+                monofásica/antecipação com encerramento de tributação (o substituído tributário do ICMS
+                deve utilizar essa opção)<br><br>
+
+                Receita Bruta Informada: {{ apuracao.bloco_com_st.base|formata_brl }}
+            </th>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                <tr>
+                    <th>IRPJ</th>
+                    <th>CSLL</th>
+                    <th>COFINS</th>
+                    <th>PIS/PASEP</th>
+                    <th>INSS/CPP</th>
+                    <th>ICMS</th>
+                    <th>IPI</th>
+                    <th>ISS</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td class="center">{{ apuracao.bloco_com_st.irpj|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_com_st.csll|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_com_st.cofins|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_com_st.pis|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_com_st.cpp|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_com_st.icms|formata_brl }}</td>
+                    <td class="center">0,00</td>
+                    <td class="center">0,00</td>
+                    <td class="center">{{ apuracao.bloco_com_st.total|formata_brl }}</td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+    </table>
+
+    <table class="tabela-padrao mt-50">
+        <tr>
+            <th class="left">
+                Totais do Estabelecimento <br>
+                Valor Informado : {{ apuracao.valor_total_nfe|formata_brl }}
+            </th>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+        <tr>
+            <td class="center">Total do Débito Declarado (exigível + suspenso)</td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                <tr>
+                    <th>IRPJ</th>
+                    <th>CSLL</th>
+                    <th>COFINS</th>
+                    <th>PIS/PASEP</th>
+                    <th>INSS/CPP</th>
+                    <th>ICMS</th>
+                    <th>IPI</th>
+                    <th>ISS</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td class="center">{{ apuracao.bloco_total_tributos.irpj|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.csll|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.cofins|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.pis|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.cpp|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.icms|formata_brl }}</td>
+                    <td class="center">0,00</td>
+                    <td class="center">0,00</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.total|formata_brl }}</td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+        <tr>
+            <td class="center">Total do Débito Com Exigibilidade Suspensa (R$)</td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                <tr>
+                    <th>IRPJ</th>
+                    <th>CSLL</th>
+                    <th>COFINS</th>
+                    <th>PIS/PASEP</th>
+                    <th>INSS/CPP</th>
+                    <th>ICMS</th>
+                    <th>IPI</th>
+                    <th>ISS</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="center">Total do Débito Exigivel</td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                <tr>
+                    <th>IRPJ</th>
+                    <th>CSLL</th>
+                    <th>COFINS</th>
+                    <th>PIS/PASEP</th>
+                    <th>INSS/CPP</th>
+                    <th>ICMS</th>
+                    <th>IPI</th>
+                    <th>ISS</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td class="center">{{ apuracao.bloco_total_tributos.irpj|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.csll|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.cofins|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.pis|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.cpp|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.icms|formata_brl }}</td>
+                    <td class="center">0,00</td>
+                    <td class="center">0,00</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.total|formata_brl }}</td>
+                </tr>
+            </table>
+            </td>
+        </tr>    
+    </table>
+
+
+    <h4>2.8)Total Geral da Empresa</h4>
+
+    <table class="tabela-padrao">
+        <tr>
+            <th class="left">
+                Totais do Estabelecimento <br>
+            </th>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+        <tr>
+            <td class="center">Total do Débito Declarado (exigível + suspenso)</td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                <tr>
+                    <th>IRPJ</th>
+                    <th>CSLL</th>
+                    <th>COFINS</th>
+                    <th>PIS/PASEP</th>
+                    <th>INSS/CPP</th>
+                    <th>ICMS</th>
+                    <th>IPI</th>
+                    <th>ISS</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td class="center">{{ apuracao.bloco_total_tributos.irpj|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.csll|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.cofins|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.pis|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.cpp|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.icms|formata_brl }}</td>
+                    <td class="center">0,00</td>
+                    <td class="center">0,00</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.total|formata_brl }}</td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="height:20px;"><pre>  </pre></td>
+        </tr>
+        <tr>
+            <td class="center">Total do Débito Com Exigibilidade Suspensa (R$)</td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                <tr>
+                    <th>IRPJ</th>
+                    <th>CSLL</th>
+                    <th>COFINS</th>
+                    <th>PIS/PASEP</th>
+                    <th>INSS/CPP</th>
+                    <th>ICMS</th>
+                    <th>IPI</th>
+                    <th>ISS</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                    <td class="centar">0,00</td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="center">Total do Débito Exigivel</td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                <tr>
+                    <th>IRPJ</th>
+                    <th>CSLL</th>
+                    <th>COFINS</th>
+                    <th>PIS/PASEP</th>
+                    <th>INSS/CPP</th>
+                    <th>ICMS</th>
+                    <th>IPI</th>
+                    <th>ISS</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td class="center">{{ apuracao.bloco_total_tributos.irpj|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.csll|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.cofins|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.pis|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.cpp|formata_brl }}</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.icms|formata_brl }}</td>
+                    <td class="center">0,00</td>
+                    <td class="center">0,00</td>
+                    <td class="center">{{ apuracao.bloco_total_tributos.total|formata_brl }}</td>
+                </tr>
+            </table>
+            </td>
+        </tr>    
+    </table>
+    <br>
+    <br>
+    <hr>
+    <br>
+    <br>
+    <div class="section">3. Informações da Transmissão</div>
+    <p class="detalhe">Data e horário da transmissão da Declaração: 05/07/2023 14:30:00</p>
+    <p class="detalhe">Número do Recibo: 00.00.00000.0000000-0</p>
+    <p class="detalhe">Autenticação: 00000.00000.00000.00000</p>
+
+    <div class="assinatura">Página 1</div>
+
+</body>
+</html>

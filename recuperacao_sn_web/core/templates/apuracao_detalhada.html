@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load format_extras %}
+{% block title %}Análise Tributária - {{ apuracao.empresa.nome }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Título -->
+  <div class="mb-4 border-bottom pb-2 d-flex justify-content-between flex-wrap align-items-center">
+    <div>
+      <h2 class="fw-bold mb-1">Apuração Detalhada</h2>
+      <p class="text-muted mb-0">{{ apuracao.empresa.nome }} — Competência: {{ apuracao.competencia }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'gerar_espelho_pgdas' apuracao.id %}" target="_blank" class="btn btn-outline-success btn-sm">
+        Visualizar Espelho PGDAS
+      </a>
+      <a href="#" class="btn btn-outline-primary btn-sm">Exportar PDF</a>
+    </div>
+  </div>
+  <!-- Bloco 1: Resumo Executivo -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-3">
+      <div class="bg-light p-3 rounded shadow-sm h-100">
+        <div class="fw-semibold text-muted mb-1">Total em Notas de Saida</div>
+        <div class="fs-5">{{ apuracao.valor_total_nfe|formata_brl }}</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="bg-light p-3 rounded shadow-sm h-100">
+        <div class="fw-semibold text-muted mb-1">DAS Pago Original</div>
+        <div class="fs-5">{{ apuracao.pgdas.valor_DAS_pago_original|formata_brl }}</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="bg-light p-3 rounded shadow-sm h-100">
+        <div class="fw-semibold text-muted mb-1">DAS Recalculado</div>
+        <div class="fs-5 ">{{ apuracao.valor_das_teorico|formata_brl }}</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="bg-light p-3 rounded shadow-sm h-100">
+        <div class="fw-semibold text-muted mb-1">Crédito Tributario</div>
+        <div class="fs-5 
+            {% if apuracao.credito_total_apurado > 0 %}text-success
+            {% elif apuracao.credito_total_apurado < 0 %}text-danger
+            {% else %}text-muted
+            {% endif %}">
+          {{ apuracao.credito_total_apurado|formata_brl }}
+        </div>
+      </div>
+    </div>
+  </div>
+<hr class="my-5">
+
+  <!-- Bloco 2: Análise Tributária -->
+  <div class="row g-4 mb-5">
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-primary text-white fw-semibold">Tributos Pagos vs Recalculados</div>
+        <div class="card-body">
+          <table class="table table-sm mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Tributo</th>
+                <th class="text-end">Original</th>
+                <th class="text-end">Recalculado</th>
+                <th class="text-end">Diferença</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ICMS</td>
+                <td class="text-end">{{ apuracao.pgdas.valor_ICMS_pago_original|formata_brl }}</td>
+                <td class="text-end">{{ apuracao.valor_icms_novo|formata_brl }}</td>
+                <td class="text-end {% if apuracao.icms_recuperado > 0 %}text-success{% elif apuracao.icms_recuperado < 0 %}text-danger{% else %}text-muted{% endif %}">
+                  {{ apuracao.icms_recuperado|formata_brl }}
+                </td>
+              </tr>
+              <tr>
+                <td>PIS</td>
+                <td class="text-end">{{ apuracao.pgdas.valor_PIS_pago_original|formata_brl }}</td>
+                <td class="text-end">{{ apuracao.valor_pis_novo|formata_brl }}</td>
+                <td class="text-end {% if apuracao.pis_recuperado > 0 %}text-success{% elif apuracao.pis_recuperado < 0 %}text-danger{% else %}text-muted{% endif %}">
+                  {{ apuracao.pis_recuperado|formata_brl }}
+                </td>
+              </tr>
+              <tr>
+                <td>COFINS</td>
+                <td class="text-end">{{ apuracao.pgdas.valor_COFINS_pago_original|formata_brl }}</td>
+                <td class="text-end">{{ apuracao.valor_cofins_novo|formata_brl }}</td>
+                <td class="text-end {% if apuracao.cofins_recuperado > 0 %}text-success{% elif apuracao.cofins_recuperado < 0 %}text-danger{% else %}text-muted{% endif %}">
+                  {{ apuracao.cofins_recuperado|formata_brl }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alíquotas -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header fw-semibold bg-primary text-white">Alíquotas Utilizadas</div>
+        <div class="card-body row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+
+          <!-- EFETIVA - Destacada -->
+          {% comment %} <div class="col">
+            <div class="bg-light border border-primary p-3 rounded text-center">
+              <div class="small text-primary fw-semibold">Efetiva</div>
+              <div class="fs-5 fw-bold text-primary">{{ apuracao.aliquota_efetiva|floatformat:2 }}%</div>
+            </div>
+          </div> {% endcomment %}
+
+          <!-- ICMS -->
+          <div class="col">
+            <div class="bg-white border p-3 rounded text-center">
+              <div class="small text-muted">ICMS</div>
+              <div class="fw-semibold">{{ apuracao.aliquota_icms|floatformat:2 }}%</div>
+            </div>
+          </div>
+
+          <!-- PIS -->
+          <div class="col">
+            <div class="bg-white border p-3 rounded text-center">
+              <div class="small text-muted">PIS</div>
+              <div class="fw-semibold">{{ apuracao.aliquota_pis|floatformat:2 }}%</div>
+            </div>
+          </div>
+
+          <!-- COFINS -->
+          <div class="col">
+            <div class="bg-white border p-3 rounded text-center">
+              <div class="small text-muted">COFINS</div>
+              <div class="fw-semibold">{{ apuracao.aliquota_cofins|floatformat:2 }}%</div>
+            </div>
+          </div>
+
+          <!-- IRPJ -->
+          <div class="col">
+            <div class="bg-white border p-3 rounded text-center">
+              <div class="small text-muted">IRPJ</div>
+              <div class="fw-semibold">{{ apuracao.aliquota_irpj|floatformat:2 }}%</div>
+            </div>
+          </div>
+
+          <!-- CSLL -->
+          <div class="col">
+            <div class="bg-white border p-3 rounded text-center">
+              <div class="small text-muted">CSLL</div>
+              <div class="fw-semibold">{{ apuracao.aliquota_csll|floatformat:2 }}%</div>
+            </div>
+          </div>
+
+          <!-- CPP -->
+          <div class="col">
+            <div class="bg-white border p-3 rounded text-center">
+              <div class="small text-muted">CPP</div>
+              <div class="fw-semibold">{{ apuracao.aliquota_cpp|floatformat:2 }}%</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+  <div class="card shadow-sm border-0 h-100">
+    <div class="card-header fw-semibold bg-primary text-white">Bases de Cálculo</div>
+    <div class="card-body row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+
+      <!-- ICMS Tributado -->
+      <div class="col">
+        <div class="bg-white border p-3 rounded text-center">
+          <div class="small text-muted">ICMS Tributado</div>
+          <div class="fw-semibold">{{ apuracao.base_icms_tributado|formata_brl }}</div>
+        </div>
+      </div>
+
+      <!-- ICMS Imune ou Isento -->
+      <div class="col">
+        <div class="bg-white border p-3 rounded text-center">
+          <div class="small text-muted">ICMS Isento / Imune</div>
+          <div class="fw-semibold">{{ apuracao.base_icms_imune_ou_isento|formata_brl }}</div>
+        </div>
+      </div>
+
+      <!-- ICMS ST -->
+      <div class="col">
+        <div class="bg-white border p-3 rounded text-center">
+          <div class="small text-muted">ICMS ST</div>
+          <div class="fw-semibold">{{ apuracao.base_icms_ST|formata_brl }}</div>
+        </div>
+      </div>
+
+      <!-- ICMS ST + PIS/COFINS Monofásico -->
+      <div class="col">
+        <div class="bg-white border p-3 rounded text-center">
+          <div class="small text-muted">ICMS ST + PIS/COFINS Monofásico</div>
+          <div class="fw-semibold">{{ apuracao.base_icms_ST_e_monofasico|formata_brl }}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+    <!-- Bloco 3: Notas Fiscais -->
+    <div>
+      <h5 class="fw-semibold mb-3">Notas Fiscais Utilizadas</h5>
+      <div class="table-responsive border rounded shadow-sm">
+        <table class="table table-bordered table-sm mb-0">
+          <thead class="table-light text-center">
+            <tr>
+              <th>Chave</th>
+              <th>Número / Série</th>
+              <th>Data</th>
+              <th>Tipo</th>
+              <th>Valor Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for nota in notas %}
+            <tr>
+              <td class="text-break">{{ nota.chave }}</td>
+              <td class="text-center">{{ nota.numero }} / {{ nota.serie }}</td>
+              <td class="text-center">{{ nota.data_emissao|date:"d/m/Y" }}</td>
+              <td class="text-center text-uppercase">{{ nota.tipo }}</td>
+              <td class="text-end">{{ nota.valor_total|formata_brl }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted">Nenhuma nota encontrada.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  {% endblock %}

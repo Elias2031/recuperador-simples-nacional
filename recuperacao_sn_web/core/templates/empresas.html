@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Empresas Cadastradas{% endblock %}
+
+{% block content %}
+<h2 class="text-black">Minhas Empresas</h2>
+
+<a href="{% url 'nova_empresa_view' %}" class="btn btn-primary mb-3">+ Nova Empresa</a>
+
+<table class="table table-bordered bg-white">
+  <thead class="table-dark">
+    <tr>
+      <th>Nome</th>
+      <th>CNPJ</th>
+      <th>Regime Tributário</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for empresa in empresas %}
+    <tr>
+      <td>{{ empresa.razao_social }}</td>
+      <td>{{ empresa.cnpj }}</td>
+      <td>{{ empresa.regime_tributario|default:"-" }}</td>
+      <td>
+        <a href="{% url 'editar_empresa_view' empresa.pk %}" class="btn btn-sm btn-warning">Editar</a>
+        <a href="{% url 'excluir_empresa_view' empresa.pk %}" class="btn btn-sm btn-danger">Excluir</a>
+        <a href="{% url 'selecionar_empresa' empresa.pk %}" class="btn btn-sm btn-success">Selecionar</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

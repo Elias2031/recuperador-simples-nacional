@@ -1,0 +1,80 @@
+main {
+  margin-left: 220px; /* largura da sidebar */
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.nav-link:hover {
+  background-color: #343a40;
+}
+
+.text-warning {
+  color: #ff6a00 !important;
+}
+
+.sidebar {
+  position: fixed;
+  top: 45px; /* altura da topbar */
+  left: 0;
+  width: 220px;
+  height: calc(100vh - 56px);
+  background-color: #000;
+  z-index: 1020;
+  overflow-y: auto;
+  box-shadow: 4px 0 8px rgba(0, 0, 0, 0.6); /* sombra lateral direita */
+}
+
+.form-control.custom-input {
+  border: 1px solid #ced4da !important;
+  border-radius: 0.375rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8); 
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control.custom-input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); 
+  
+}
+
+.sombra_cards {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.sidebar img {
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.1));
+}
+.sidebar h6 {
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+/* Container com perspectiva 3D */
+.logo-container {
+  perspective: 1000px;
+  display: inline-block;
+  padding: 2px;
+}
+
+/* Logo com transição suave */
+.logo-rotativa {
+  transition: transform 5s cubic-bezier(0.25, 1, 0.5, 1), filter 0.4s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+  display: inline-block;
+}
+
+/* Efeito quando o CONTAINER é hover — só a imagem gira */
+.logo-container:hover .logo-rotativa {
+  transform: rotateY(180deg) scale(1.05);
+  filter: drop-shadow(0 0 12px rgba(255, 166, 0, 0.7));
+}
+
+.navbar-fixed-top {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}

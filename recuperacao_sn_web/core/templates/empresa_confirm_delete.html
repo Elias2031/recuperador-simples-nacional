@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Empresa{% endblock %}
+
+{% block content %}
+<h2>Tem certeza que deseja excluir esta empresa?</h2>
+<p><strong>{{ empresa.nome }}</strong> ({{ empresa.cnpj }})</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+  <a href="{% url 'empresas_view' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

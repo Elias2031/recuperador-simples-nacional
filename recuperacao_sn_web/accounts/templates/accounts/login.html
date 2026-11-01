@@ -1,0 +1,41 @@
+{% extends 'accounts/login_base.html' %}
+{% load static %}
+
+{% block title %}Morpho | Login{% endblock %}
+
+{% block content %}
+<div class="login-card text-center">
+  <!-- Logo -->
+  <img src="{% static 'img/logo-morpho-automacao-contabil.png' %}" alt="Morpho" width="80" class="mb-3">
+
+  <!-- Título -->
+  <h3 class="morpho-title mb-0">Morpho</h3>
+  <p class="morpho-subtitle mb-4">Recuperador Tributário</p>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" class="text-start">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">E-mail</label>
+      <input type="email" name="username" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Senha</label>
+      <input type="password" name="password" class="form-control" required>
+    </div>
+    <div class="d-grid">
+      <button type="submit" class="btn btn-primary">Entrar</button>
+    </div>
+  </form>
+
+  <div class="mt-3">
+    <a href="{% url 'cadastro' %}">Ainda não tem uma conta? Cadastre-se</a><br>
+    <a href="{% url 'password_reset' %}">Esqueceu sua senha?</a>
+  </div>
+</div>
+{% endblock %}

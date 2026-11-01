@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Análise Tributária - {{ ncm.ncm }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="text-black fw-bold">🔍 Análise Tributária do NCM {{ ncm.ncm }}</h4>
+    <a href="{% url 'analise_tributaria' %}" class="btn btn-outline-secondary btn-sm">← Voltar</a>
+  </div>
+
+  <div class="row g-4">
+
+    {% comment %} {% comment "Seção: Informações Gerais" %} {% endcomment %}
+    <div class="col-md-4">
+      <div class="card shadow h-100">
+        <div class="card-header bg-black text-white">
+          <strong>📦 Informações Gerais</strong>
+        </div>
+        <div class="card-body">
+          <p><strong>NCM:</strong> {{ ncm.ncm }}</p>
+          <p><strong>Item:</strong> {{ ncm.nome_item|default:"Não informado" }}</p>
+          <p><strong>TIPI:</strong> {{ ncm.desc_tipi|default:"Não analisado" }}</p>
+          <p><strong>CEST:</strong> {{ ncm.cest|default:"-" }}</p>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} {% comment "Seção: ICMS" %} {% endcomment %}
+    <div class="col-md-4">
+      <div class="card shadow h-100">
+        <div class="card-header bg-black text-white">
+          <strong>🧾 ICMS</strong>
+        </div>
+        <div class="card-body">
+          <p><strong>Alíquota:</strong> {{ ncm.aliquota_icms_retornado|default:"-" }}</p>
+          <p><strong>CST:</strong> {{ ncm.cst_icms|default:"-" }}</p>
+          <p><strong>Descrição:</strong> {{ ncm.descricao_icms_retornado|default:"-" }}</p>
+          <p><strong>Base Legal:</strong> {{ ncm.base_legal_icms_retornado|default:"-" }}</p>
+          <p><strong>Vigência:</strong> {{ ncm.vigencia_inicial_icms|date:"d/m/Y" }}</p>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} {% comment "Seção: ST" %} {% endcomment %}
+    <div class="col-md-4">
+      <div class="card shadow h-100">
+        <div class="card-header bg-black text-white">
+          <strong>🏷️ Substituição Tributária</strong>
+        </div>
+        <div class="card-body">
+          <p><strong>Descrição:</strong> {{ ncm.descricao_st|default:"-" }}</p>
+          <p><strong>Segmentos:</strong> {{ ncm.segmentos_st|default:"-" }}</p>
+          <p><strong>MVA:</strong> {{ ncm.mva|default:"-" }}</p>
+          <p><strong>MVA Ajustada 4%:</strong> {{ ncm.mva_ajustada_4|default:"-" }}</p>
+          <p><strong>Vigência:</strong> {{ ncm.vigencia_inicial_st|date:"d/m/Y" }}</p>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} {% comment "Seção: ST Interestadual" %} {% endcomment %}
+    <div class="col-md-6">
+      <div class="card shadow h-100">
+        <div class="card-header bg-black text-white">
+          <strong>🌐 ST Interestadual</strong>
+        </div>
+        <div class="card-body">
+          <p><strong>Descrição:</strong> {{ ncm.descricao_st_interestadual|default:"Não tem ST Interestadual" }}</p>
+          <p><strong>Segmento:</strong> {{ ncm.segmento_st_interestadual|default:"Não tem ST Interestadual" }}</p>
+          <p><strong>MVA Original:</strong> {{ ncm.mva_original_st_interestadual|default:"Não tem ST Interestadual" }}</p>
+          <p><strong>MVA Ajustada 4%:</strong> {{ ncm.mva_ajustada_4_st_interestadual|default:"Não tem ST Interestadual" }}</p>
+          <p><strong>Base Legal:</strong> {{ ncm.base_legal_st_interestadual|default:"Não tem ST Interestadual" }}</p>
+          <p><strong>Aplicabilidade:</strong> {{ ncm.aplicabilidade_st_interestadual|default:"Não tem ST Interestadual" }}</p>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} {% comment "Seção: PIS e COFINS" %} {% endcomment %}
+    <div class="col-md-6">
+      <div class="card shadow h-100">
+        <div class="card-header bg-black text-white">
+          <strong>📑 PIS e COFINS</strong>
+        </div>
+        <div class="card-body">
+          <p><strong>CST Simples:</strong> {{ ncm.cst_simples_pis_cofins|default:"-" }}</p>
+          <p><strong>Base Legal:</strong> {{ ncm.base_legal_pis_cofins|default:"-" }}</p>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} {% comment "Seção: Observações Finais" %} {% endcomment %}
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-header bg-black">
+          <strong class='text-white'>📌 Observações</strong>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>ICMS:</strong> {{ ncm.observacao_icms|default:"-" }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>ST:</strong> {{ ncm.observacao_st|default:"-" }}</p>
+            </div>
+          </div>
+          <hr>
+          <p class="text-muted small">
+            Criado em {{ ncm.criado_em|date:"d/m/Y H:i" }} |
+            Atualizado em {{ ncm.atualizado_em|date:"d/m/Y H:i" }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

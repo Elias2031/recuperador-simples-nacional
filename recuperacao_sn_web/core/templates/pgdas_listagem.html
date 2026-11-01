@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Declarações PGDAS{% endblock %}
+{% block content %}
+{% load format_extras %}
+
+<h2 class="mb-4">📋 Declarações PGDAS</h2>
+
+<form method="get" class="row g-2 mb-4">
+  <div class="col-md-4">
+    <input type="text" name="cnpj" class="form-control" placeholder="🔍 Buscar por CNPJ" value="{{ request.GET.cnpj }}">
+  </div>
+  <div class="col-md-4">
+    <input type="text" name="competencia" class="form-control" placeholder="🗓 Competência (ex: 03_2025)" value="{{ request.GET.competencia }}">
+  </div>
+  <div class="col-md-4">
+    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+  </div>
+</form>
+
+<div class="table-responsive">
+  <table class="table table-bordered table-hover bg-white small">
+    <thead class="table-dark">
+      <tr>
+        {% comment %} <th>Empresa</th> {% endcomment %}
+        <th>Competência</th>
+        <th>Receita Bruta</th>
+        <th>RBT12</th>
+        <th>DAS</th>
+        <th>IRPJ</th>
+        <th>CSLL</th>
+        <th>COFINS</th>
+        <th>PIS</th>
+        <th>INSS</th>
+        <th>ICMS</th>
+        <th>IPI</th>
+        <th>ISS</th>
+        <th>Arquivo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in pgdas %}
+        <tr>
+          {% comment %} <td>{{ p.empresa.razao_social }}<br><small>{{ p.empresa.cnpj }}</small></td> {% endcomment %}
+          <td>{{ p.competencia }}</td>
+          <td>{{ p.receita_bruta|formata_brl }}</td>
+          <td>{{ p.valor_rbt12|formata_brl }}</td>
+          <td>{{ p.valor_DAS_pago_original|formata_brl }}</td>
+          <td>{{ p.valor_IRPJ_pago_original|formata_brl }}</td>
+          <td>{{ p.valor_CSLL_pago_original|formata_brl }}</td>
+          <td>{{ p.valor_COFINS_pago_original|formata_brl }}</td>
+          <td>{{ p.valor_PIS_pago_original|formata_brl }}</td>
+          <td>{{ p.valor_INSS_pago_original|formata_brl }}</td>
+          <td>{{ p.valor_ICMS_pago_original|formata_brl }}</td>
+          <td>{{ p.valor_IPI_pago_original|formata_brl }}</td>
+          <td>{{ p.valor_ISS_pago_original|formata_brl }}</td>
+          <td class="text-nowrap">
+            {% if p.arquivo_pdf %}
+              <a href="{{ p.arquivo_pdf.url }}" target="_blank" class="btn btn-sm btn-outline-primary">📄 Ver</a>
+            {% endif %}
+            <form method="POST" action="{% url 'excluir_pgdas' p.id %}" class="d-inline ms-1" onsubmit="return confirm('Tem certeza que deseja excluir esta declaração PGDAS?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-danger">🗑️</button>
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="13" class="text-center text-muted">Nenhum dado PGDAS encontrado.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

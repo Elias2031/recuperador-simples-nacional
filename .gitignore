@@ -1,0 +1,71 @@
+# Ambientes virtuais
+venv/
+.venv/
+env/
+ENV/
+
+# Variáveis de ambiente / segredos
+.env
+*.env
+!.env.example
+
+# Compilados Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribuição / build
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Testes / cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+
+# Django
+*.sqlite3
+db.sqlite3
+db.sqlite3-journal
+*.db
+staticfiles/
+media/
+local_settings.py
+
+# Celery e Redis
+celerybeat-schedule
+celerybeat.pid
+dump.rdb
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs e temporários
+*.log
+*.bak
+*.tmp
+*.swp
+*~
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Certificados digitais
+*.pfx
+*.p12
+*.pem
+*.key
+*.crt
+
+# Arquivos fiscais carregados pelo usuário (XML, PDF, ZIP, SPED)
+uploads/
+*.zip
+*.pdf
+*.xml
